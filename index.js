@@ -66,7 +66,6 @@ var CODES = {
 	},
 	'end': {}
 };
-//CODES.end = CODES.success.concat (CODES.error);
 
 // The Bird "class"
 // ============================================================================
@@ -146,6 +145,7 @@ Bird.prototype.state = function (state) {
 		}
 	}
 
+	// Always return the new/current state
 	return (stateMap [this.__INTERNALS.state]);
 };
 
@@ -154,21 +154,26 @@ Bird.prototype.open = function (options, callback) {
 	var self = this;
 
 	if (isType (callback, 'function')) {
+		// Add the open callback to EventEmitter
 		this.on ('open', callback);
 	}
 
+	// Check the path exists
 	if (! fs.existsSync (this.__SETTINGS.path)) {
 		this.emit ('open', new Error ('Bird socket does not exist at "' + this.__SETTINGS.path + '"'));
 		return (null);
 	}
 
+	// Check that the path is a UNIX socket
 	var socketStat = fs.statSync (this.__SETTINGS.path);
 	if (! socketStat || ! socketStat.isSocket ()) {
 		this.emit ('open', new Error ('Bird socket at "' + this.__SETTINGS.path + '" is not a socket'));
 		return (null);
 	}
 
+	// Create a new Socket
 	this.__INTERNALS.socket = new net.Socket ();
+	// Connect the socket to the path
 	this.__INTERNALS.socket.connect (this.__SETTINGS.path, function (err) {
 		// Pass any errors back to the caller
 		if (err) {
@@ -188,6 +193,7 @@ Bird.prototype.open = function (options, callback) {
 
 		// Set state to open
 		self.state ('open');
+		// Emit the open event
 		self.emit ('open', null);
 
 		// Setup our event handlers
@@ -224,7 +230,7 @@ Bird.prototype.open = function (options, callback) {
 					// Welcome message
 					// Set state to restricted
 					self.state ('restrict');
-					// Enter restricted mode
+					// Enter restricted mode (unshift() so it's definitely first)
 					self.__INTERNALS.commands.unshift ({
 						'command': 'restrict',
 						'callback': function (err, data) {
@@ -269,12 +275,15 @@ Bird.prototype.open = function (options, callback) {
 					self.__NEXTCOMMAND ();
 
 				} else if (code.match (/^[0-9]/)) {
+					// Some other code, just append the data
 					self.__INTERNALS.command.buffer += line.substr (5) + "\n";
 
 				} else if (code.charAt (0) == ' ') {
+					// A space? Just append the data
 					self.__INTERNALS.command.buffer += line.substr (1) + "\n";
 
 				} else if (code.charAt (0) == '+') {
+					// A + tells us the line will wrap
 					self.__INTERNALS.command.buffer += line.substr (1);
 
 				} else {
@@ -283,8 +292,6 @@ Bird.prototype.open = function (options, callback) {
 			}
 		});
 
-		//this.on ('end', self.__CLOSE);
-		//this.on ('timeout', self.__CLOSE);
 		this.on ('close', function (err) {
 			// Set the state
 			self.state ('closed');
