@@ -1,6 +1,7 @@
 var util = require ('util');
 var EventEmitter = require ('events').EventEmitter;
 var net = require ('net');
+var fs = require ('fs');
 
 // Export our class
 module.exports = Bird;
@@ -156,6 +157,17 @@ Bird.prototype.open = function (options, callback) {
 		this.on ('open', callback);
 	}
 
+	if (! fs.existsSync (this.__SETTINGS.path)) {
+		this.emit ('open', new Error ('Bird socket does not exist at "' + this.__SETTINGS.path + '"'));
+		return (null);
+	}
+
+	var socketStat = fs.statSync (this.__SETTINGS.path);
+	if (! socketStat || ! socketStat.isSocket ()) {
+		this.emit ('open', new Error ('Bird socket at "' + this.__SETTINGS.path + '" is not a socket'));
+		return (null);
+	}
+
 	this.__INTERNALS.socket = new net.Socket ();
 	this.__INTERNALS.socket.connect (this.__SETTINGS.path, function (err) {
 		// Pass any errors back to the caller
@@ -290,7 +302,7 @@ Bird.prototype.open = function (options, callback) {
 			this.emit ('error', err);
 		});
 	});
-}
+};
 
 Bird.prototype.close = function (callback) {
 	// You can only close if you're not closed
@@ -333,7 +345,7 @@ Bird.prototype.__NEXTCOMMAND = function () {
 		// Write the command
 		this.__INTERNALS.socket.write (this.__INTERNALS.command.command + "\n");
 	}
-}
+};
 
 // Useful wrappers
 // ============================================================================
@@ -341,7 +353,7 @@ function isType (variable, type) {
 	var typeOf;
 
 	if (variable) {
-		typeOf = new String (typeof (variable));
+		typeOf = typeof (variable);
 		if (typeOf.toLowerCase () === type.toLowerCase ()) {
 			return (true);
 		}
