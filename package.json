@@ -1,6 +1,6 @@
 {
 	"name": "Bird",
-	"version": "0.1.0",
+	"version": "0.1.2",
 	"description": "NodeJS interface to the Bird BGP daemon control socket",
 	"author": {
 		"name": "Jeff Walter",
@@ -19,7 +19,7 @@
 		"url": "https://github.com/jeffwalter/Bird/issues"
 	},
 	"homepage": "https://github.com/jeffwalter/Bird",
-	"_id": "Bird@0.1.0",
+	"_id": "Bird@0.1.2",
 	"dist": {
 		"shasum": ""
 	},
