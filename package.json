@@ -1,6 +1,6 @@
 {
-	"name": "Bird",
-	"version": "0.1.2",
+	"name": "birdbgp",
+	"version": "0.1.4",
 	"description": "NodeJS interface to the Bird BGP daemon control socket",
 	"author": {
 		"name": "Jeff Walter",
@@ -10,19 +10,19 @@
 	"main": "./index.js",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/jeffwalter/Bird.git"
+		"url": "git://github.com/jeffwalter/birdbgp.git"
 	},
 	"dependencies": {
 	},
 	"readmeFilename": "README.md",
 	"bugs": {
-		"url": "https://github.com/jeffwalter/Bird/issues"
+		"url": "https://github.com/jeffwalter/birdbgp/issues"
 	},
-	"homepage": "https://github.com/jeffwalter/Bird",
-	"_id": "Bird@0.1.2",
+	"homepage": "https://github.com/jeffwalter/birdbgp",
+	"_id": "birdbgp@0.1.4",
 	"dist": {
 		"shasum": ""
 	},
-	"_from": "Bird@",
+	"_from": "birdbgp@",
 	"_resolved": ""
 }

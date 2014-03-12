@@ -1,6 +1,6 @@
-var Bird = require ('./');
+var BirdBGP = require ('./');
 
-var bird = new Bird ();
+var bird = new BirdBGP ();
 bird.on ('open', function (err) {
 	console.log ('Bird:open');
 	if (err) {

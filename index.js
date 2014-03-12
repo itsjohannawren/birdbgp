@@ -4,10 +4,10 @@ var net = require ('net');
 var fs = require ('fs');
 
 // Export our class
-module.exports = Bird;
+module.exports = birdbgp;
 
-// Bird is an EventEmitter
-util.inherits (Bird, EventEmitter);
+// birdbgp is an EventEmitter
+util.inherits (birdbgp, EventEmitter);
 
 // Local globals
 var CODES = {
@@ -67,9 +67,9 @@ var CODES = {
 	'end': {}
 };
 
-// The Bird "class"
+// The birdbgp "class"
 // ============================================================================
-function Bird (options, callbacks) {
+function birdbgp (options, callbacks) {
 	// Who's running this party?
 	EventEmitter.call (this);
 
@@ -115,7 +115,7 @@ function Bird (options, callbacks) {
 	}
 }
 
-Bird.prototype.state = function (state) {
+birdbgp.prototype.state = function (state) {
 	var stateMap = {
 		'closed': 0,
 		'open': 1,
@@ -149,7 +149,7 @@ Bird.prototype.state = function (state) {
 	return (stateMap [this.__INTERNALS.state]);
 };
 
-Bird.prototype.open = function (options, callback) {
+birdbgp.prototype.open = function (options, callback) {
 	// For later use
 	var self = this;
 
@@ -311,7 +311,7 @@ Bird.prototype.open = function (options, callback) {
 	});
 };
 
-Bird.prototype.close = function (callback) {
+birdbgp.prototype.close = function (callback) {
 	// You can only close if you're not closed
 	if (this.state () != 'closed') {
 		// Set state to closed
@@ -321,11 +321,11 @@ Bird.prototype.close = function (callback) {
 	}
 };
 
-Bird.prototype.command = function (command, callback) {
+birdbgp.prototype.command = function (command, callback) {
 	// Make sure we have a callback
 	if (! isType (callback, 'function')) {
 		// Nope! Complain to the console
-		console.error ('Error: Callback for Bird.command() is not optional');
+		console.error ('Error: Callback for birdbgp.command() is not optional');
 		// Be done
 		return (null);
 	}
@@ -342,7 +342,7 @@ Bird.prototype.command = function (command, callback) {
 	}
 };
 
-Bird.prototype.__NEXTCOMMAND = function () {
+birdbgp.prototype.__NEXTCOMMAND = function () {
 	if (
 		(this.state () == 'ready' && this.__INTERNALS.commands [0]) ||
 		(this.state () == 'restrict' && this.__INTERNALS.commands [0] && (this.__INTERNALS.commands [0].command == 'restrict'))
