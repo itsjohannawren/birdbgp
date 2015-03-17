@@ -347,6 +347,8 @@ birdbgp.prototype.__NEXTCOMMAND = function () {
 		(this.state () == 'ready' && this.__INTERNALS.commands [0]) ||
 		(this.state () == 'restrict' && this.__INTERNALS.commands [0] && (this.__INTERNALS.commands [0].command == 'restrict'))
 	) {
+        // We are now busy
+        this.state('waiting');
 		// Store the command
 		this.__INTERNALS.command = this.__INTERNALS.commands.shift ();
 		// Write the command
