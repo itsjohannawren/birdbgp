@@ -160,6 +160,18 @@ birdbgp.prototype.state = function (state) {
 	return (stateMap [this.__INTERNALS.state]);
 };
 
+birdbgp.prototype.reConnect = function() {
+    var self = this;
+
+    if (this.__INTERNALS.connectT)
+        return;
+    this.__INTERNALS.connectT = setTimeout(function() {
+        self.__INTERNALS.connectT = undefined;
+        self.open();
+    }, 500);
+
+};
+
 birdbgp.prototype.open = function (options, callback) {
 	// For later use
 	var self = this;
@@ -184,6 +196,18 @@ birdbgp.prototype.open = function (options, callback) {
 
 	// Create a new Socket
 	this.__INTERNALS.socket = new net.Socket ();
+
+    this.__INTERNALS.socket.on('error', function(err) {
+        self.state('closed');
+	    self.__INTERNALS.socket = null;
+	    // Clear the buffer
+	    self.__INTERNALS.buffer = '';
+	    self.__INTERNALS.commands = [];
+        self.reConnect();
+        return(null);
+    });
+
+
 	// Connect the socket to the path
 	this.__INTERNALS.socket.connect (this.__SETTINGS.path, function (err) {
 		// Pass any errors back to the caller
@@ -198,6 +222,7 @@ birdbgp.prototype.open = function (options, callback) {
 			
 			// Call the open event
 			self.emit ('open', err);
+            self.reConnect();
 			// No mas
 			return (null);
 		}
@@ -344,6 +369,12 @@ birdbgp.prototype.command = function (command, callback) {
 		// Be done
 		return (null);
 	}
+
+    // if socket closed, doesn't enqueue command
+    if (this.state() == 'closed') {
+        this.reConnect();
+        return callback(new Error("Bird isn't connected"), '0009');
+    }
 
 	// Store the command and callback
 	this.__INTERNALS.commands.push ({
