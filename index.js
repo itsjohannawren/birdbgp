@@ -98,6 +98,17 @@ function birdbgp (options, callbacks) {
 		});
 	}
 
+	if (isType (options, 'object')) {
+		// Loop through all of the settings
+		Object.keys(options).forEach(function (key) {
+			// Check that the setting name exists
+			if (self.__SETTINGS [key] !== undefined) {
+				// Set the setting
+				self.__SETTINGS [key] = options[key];
+			}
+		});
+	}
+
 	if (isType (callbacks, 'array')) {
 		// Loop through all of the callbacks
 		callbacks.forEach (function (callback, event, array) {
@@ -149,6 +160,18 @@ birdbgp.prototype.state = function (state) {
 	return (stateMap [this.__INTERNALS.state]);
 };
 
+birdbgp.prototype.reConnect = function() {
+    var self = this;
+
+    if (this.__INTERNALS.connectT)
+        return;
+    this.__INTERNALS.connectT = setTimeout(function() {
+        self.__INTERNALS.connectT = undefined;
+        self.open();
+    }, 500);
+
+};
+
 birdbgp.prototype.open = function (options, callback) {
 	// For later use
 	var self = this;
@@ -173,6 +196,18 @@ birdbgp.prototype.open = function (options, callback) {
 
 	// Create a new Socket
 	this.__INTERNALS.socket = new net.Socket ();
+
+    this.__INTERNALS.socket.on('error', function(err) {
+        self.state('closed');
+	    self.__INTERNALS.socket = null;
+	    // Clear the buffer
+	    self.__INTERNALS.buffer = '';
+	    self.__INTERNALS.commands = [];
+        self.reConnect();
+        return(null);
+    });
+
+
 	// Connect the socket to the path
 	this.__INTERNALS.socket.connect (this.__SETTINGS.path, function (err) {
 		// Pass any errors back to the caller
@@ -187,6 +222,7 @@ birdbgp.prototype.open = function (options, callback) {
 			
 			// Call the open event
 			self.emit ('open', err);
+            self.reConnect();
 			// No mas
 			return (null);
 		}
@@ -254,11 +290,13 @@ birdbgp.prototype.open = function (options, callback) {
 					// Remove the command from current
 					self.__INTERNALS.command = null;
 					// Call the callback with no error, the code, and the response
-					command.callback (null, code, command.buffer);
+					setTimeout(function() { command.callback (null, code, command.buffer); }, 0);
 					// Set the state to ready
 					self.state ('ready');
 					// Try to run another command
-					self.__NEXTCOMMAND ();
+					setTimeout(function() {
+					    self.__NEXTCOMMAND ();
+					}, 0);
 
 				} else if (CODES.error [code]) {
 					// Error returned
@@ -272,7 +310,9 @@ birdbgp.prototype.open = function (options, callback) {
 					self.state ('ready');
 					
 					// Try to run another command
-					self.__NEXTCOMMAND ();
+					setTimeout(function() {
+					    self.__NEXTCOMMAND ();
+					}, 0);
 
 				} else if (code.match (/^[0-9]/)) {
 					// Some other code, just append the data
@@ -329,6 +369,12 @@ birdbgp.prototype.command = function (command, callback) {
 		// Be done
 		return (null);
 	}
+
+    // if socket closed, doesn't enqueue command
+    if (this.state() == 'closed') {
+        this.reConnect();
+        return callback(new Error("Bird isn't connected"), '0009');
+    }
 
 	// Store the command and callback
 	this.__INTERNALS.commands.push ({
