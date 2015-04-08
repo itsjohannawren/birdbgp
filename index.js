@@ -70,6 +70,8 @@ var CODES = {
 // The birdbgp "class"
 // ============================================================================
 function birdbgp (options, callbacks) {
+    var self = this;
+
 	// Who's running this party?
 	EventEmitter.call (this);
 
@@ -94,6 +96,17 @@ function birdbgp (options, callbacks) {
 			if (this.__SETTINGS [setting] !== undefined) {
 				// Set the setting
 				this.__SETTINGS [setting] = value;
+			}
+		});
+	}
+
+	if (isType (options, 'object')) {
+		// Loop through all of the settings
+		Object.keys(options).forEach(function (key) {
+			// Check that the setting name exists
+			if (self.__SETTINGS [key] !== undefined) {
+				// Set the setting
+				self.__SETTINGS [key] = options[key];
 			}
 		});
 	}
