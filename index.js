@@ -254,11 +254,13 @@ birdbgp.prototype.open = function (options, callback) {
 					// Remove the command from current
 					self.__INTERNALS.command = null;
 					// Call the callback with no error, the code, and the response
-					command.callback (null, code, command.buffer);
+					setTimeout(function() { command.callback (null, code, command.buffer); }, 0);
 					// Set the state to ready
 					self.state ('ready');
 					// Try to run another command
-					self.__NEXTCOMMAND ();
+					setTimeout(function() {
+					    self.__NEXTCOMMAND ();
+					}, 0);
 
 				} else if (CODES.error [code]) {
 					// Error returned
@@ -272,7 +274,9 @@ birdbgp.prototype.open = function (options, callback) {
 					self.state ('ready');
 					
 					// Try to run another command
-					self.__NEXTCOMMAND ();
+					setTimeout(function() {
+					    self.__NEXTCOMMAND ();
+					}, 0);
 
 				} else if (code.match (/^[0-9]/)) {
 					// Some other code, just append the data
