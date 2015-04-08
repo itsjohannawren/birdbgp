@@ -70,6 +70,8 @@ var CODES = {
 // The birdbgp "class"
 // ============================================================================
 function birdbgp (options, callbacks) {
+    var self = this;
+
 	// Who's running this party?
 	EventEmitter.call (this);
 
@@ -94,6 +96,17 @@ function birdbgp (options, callbacks) {
 			if (this.__SETTINGS [setting] !== undefined) {
 				// Set the setting
 				this.__SETTINGS [setting] = value;
+			}
+		});
+	}
+
+	if (isType (options, 'object')) {
+		// Loop through all of the settings
+		Object.keys(options).forEach(function (key) {
+			// Check that the setting name exists
+			if (self.__SETTINGS [key] !== undefined) {
+				// Set the setting
+				self.__SETTINGS [key] = options[key];
 			}
 		});
 	}
@@ -254,11 +267,13 @@ birdbgp.prototype.open = function (options, callback) {
 					// Remove the command from current
 					self.__INTERNALS.command = null;
 					// Call the callback with no error, the code, and the response
-					command.callback (null, code, command.buffer);
+					setTimeout(function() { command.callback (null, code, command.buffer); }, 0);
 					// Set the state to ready
 					self.state ('ready');
 					// Try to run another command
-					self.__NEXTCOMMAND ();
+					setTimeout(function() {
+					    self.__NEXTCOMMAND ();
+					}, 0);
 
 				} else if (CODES.error [code]) {
 					// Error returned
@@ -272,7 +287,9 @@ birdbgp.prototype.open = function (options, callback) {
 					self.state ('ready');
 					
 					// Try to run another command
-					self.__NEXTCOMMAND ();
+					setTimeout(function() {
+					    self.__NEXTCOMMAND ();
+					}, 0);
 
 				} else if (code.match (/^[0-9]/)) {
 					// Some other code, just append the data
