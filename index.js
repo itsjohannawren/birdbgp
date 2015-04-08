@@ -98,6 +98,17 @@ function birdbgp (options, callbacks) {
 		});
 	}
 
+	if (isType (options, 'object')) {
+		// Loop through all of the settings
+		Object.keys(options).forEach(function (key) {
+			// Check that the setting name exists
+			if (self.__SETTINGS [key] !== undefined) {
+				// Set the setting
+				self.__SETTINGS [key] = options[key];
+			}
+		});
+	}
+
 	if (isType (callbacks, 'array')) {
 		// Loop through all of the callbacks
 		callbacks.forEach (function (callback, event, array) {
